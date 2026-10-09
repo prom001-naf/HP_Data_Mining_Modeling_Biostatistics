@@ -1,0 +1,168 @@
+---
+title: "Assignment 1 - Introduction and Wrangling"
+author: 'Nafis Mohammad'
+date: 'October 06, 2026'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+## Set-Up
+
+The dataset can be accessed here: https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+%28Diagnostic%29
+
+The phenotype attributions are as follows: 
+
+1) ID number
+2) Diagnosis (M = malignant, B = benign)
+3-32)
+
+Ten real-valued features are computed for each cell nucleus:
+
+a) radius (mean of distances from center to points on the perimeter)
+b) texture (standard deviation of gray-scale values)
+c) perimeter
+d) area
+e) smoothness (local variation in radius lengths)
+f) compactness (perimeter^2 / area - 1.0)
+g) concavity (severity of concave portions of the contour)
+h) concave points (number of concave portions of the contour)
+i) symmetry
+j) fractal dimension ("coastline approximation" - 1)
+
+Here is some code to read in the dataset
+
+> bCancer <- read.csv(here("3_csv", "breastCancer.csv"), header=T)
+
+## Questions
+
+1. When installing a package with the `install.packages()` function, the incoming package name needs to be enclosed in quotations. Why is this? [1]
+
+```{r}
+install.packages("here", repos = "https://cloud.r-project.org")
+install.packages("tidyverse", repos = "https://cloud.r-project.org")
+library(here)
+library(tidyverse)
+```
+
+The incoming package name needs to be enclosed in quotations because its input is valued as a character string, not as an active variable or symbol within the work space.
+
+2. Create a vector object with a numeric value, a character value, and a logical value. What data type is this vector and why? [1]
+
+```{r}
+x <- c(44, "Lion", TRUE)
+x
+
+```
+The data type as seen above is a character vector, the reason it does this is because R performs type coercion and converts every value to the most flexible type which in this statement here is character.
+
+3. Create a new object called `recent_fruits`.
+
+a) Create 5 rows with the rownames as different fruits and 3 columns named "colour", "shape", and "taste". Describe the fruit's colour and shape in one word, rank the taste out of 10. Fill out the table! [0.5]
+
+```{r}
+recent_fruits <- data.frame(
+  colour = c("red","yellow","orange","green","black"),
+  shape = c("round","curved","round","oval","pebbled"),
+  taste = c(10,10,8,6,4),
+  row.names = c("Apple","Banana","Orange","Kiwi","Blackberry")
+)
+
+recent_fruits
+```
+
+
+b) Calculate the mean taste rank from your previous table. [0.5]
+
+```{r}
+mean_taste <- mean(recent_fruits$taste)
+mean_taste
+```
+
+
+c) Write a function called "middle_mean" that removes the largest and smallest taste rating, and then calculates the mean. Use the function on your dataset. *Hint*: you may need any of these functions: min(), max(), nrow(), length(). [0.75]
+
+```{r}
+middle_mean <- function(x) {
+  x <- x[x != min(x) & x != max(x)]
+  mean(x)
+}
+
+middle_mean(recent_fruits$taste)
+```
+
+
+4. Use the Cancer data set.
+
+```{r}
+breastCancer <- read.csv("breastCancer.csv")
+```
+
+
+a) Subset the samples with a mean radius less than 20 into a new object called `large_tumour`. [0.5]
+
+```{r}
+large_tumour <- breastCancer[breastCancer$radius_mean <20,]
+large_tumour
+```
+
+
+b) From the `large_tumour` object, subset for the columns describing the `id`, `diagnosis`, `radius_mean`, `texture_mean`, `smoothness_mean`, and `compactness_mean`. Reshape the data into a longer format so that there are only four columns: `id`, `diagnosis`, `variable`, and `value`. Save this into a new object called `large_tumour_long`. [0.5]
+
+```{r}
+large_tumour_long <- large_tumour %>%
+  select (id,diagnosis,radius_mean,texture_mean,smoothness_mean,compactness_mean) %>%
+  pivot_longer(
+    cols = c(radius_mean,texture_mean,smoothness_mean,compactness_mean),
+    names_to = "variable",
+    values_to = "value"
+  )
+
+large_tumour_long
+```
+
+
+c) Group your data by diagnosis and variable, and calculate the mean, median, max, min, standard deviation, and count the number of observations. Save this into a table object called `large_tumour_summary`. *Hint*: first, figure out what type of data format you may need (`large_tumour_long` or `large_tumour`), and then check that your data columns are the correct class. [0.5]
+
+```{r}
+str(large_tumour_long)
+
+large_tumour_summary <- large_tumour_long %>%
+  group_by(diagnosis, variable) %>%
+  summarize(
+    mean = mean(value),
+    median = median(value),
+    max = max(value),
+    min = min(value),
+    sd = sd(value),
+    count = n()
+  )
+
+large_tumour_summary
+```
+
+
+d) Which patients have the 5 largest `radius_mean`, and what is their diagnosis? Which patients have the 5 smallest `radius_mean`, and what is their diagnosis? What does this trend potentially tell you about the data? *Hint*: there are multiple measurements for each patient, so use mean() to average these measurements. [0.75]
+
+```{r}
+patient_radius <- breastCancer %>%
+  group_by(id,diagnosis) %>%
+  summarize(
+    mean_radius = mean(radius_mean)
+  )
+
+
+largest_radius <- patient_radius %>%
+  arrange(desc(mean_radius)) %>%
+  head(5)
+
+largest_radius
+
+
+smallest_radius <- patient_radius %>%
+  arrange(mean_radius) %>%
+  head(5)
+
+smallest_radius
+```
+
