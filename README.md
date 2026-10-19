@@ -302,6 +302,169 @@ To reproduce the analysis:
 
 ---
 
+## 🧬 Assignment 2: Data Wrangling
+
+### Assignment Overview
+
+This assignment focuses on using **R** and the **tidyverse** to perform vector operations, calculate descriptive statistics, and manipulate biological datasets.
+
+The objective is to strengthen foundational data wrangling skills by working with numeric vectors and R's built-in `CO2` dataset, which contains measurements of carbon dioxide uptake in plants.
+
+The assignment consists of two main parts:
+
+1. Vector Operations and Statistical Calculations
+2. CO2 Dataset Analysis and Data Wrangling
+
+---
+
+### Part A: Vector Operations and Statistical Calculations
+
+#### Objective
+
+Practice creating, indexing, transforming, and summarizing numeric vectors in R.
+
+#### Tasks
+
+**1. Create and compare vectors**
+
+- Create a vector named `v` containing every integer from 0 through 30.
+- Create a vector named `w` containing every third integer over the same range using `seq()`.
+- Calculate the difference between the lengths of `v` and `w`.
+
+**2. Perform vector indexing and statistical calculations**
+
+- Create `v_square` by selecting elements at positions 3, 6, 7, 10, 15, 22, 23, 24, and 30 in `v` and squaring those values.
+- Calculate the mean of the first five elements in `v_square`.
+- Calculate the median of the first five elements in `v_square`.
+
+**3. Apply logical comparisons**
+
+- Create a Boolean vector named `v_bool` that identifies elements in `v` greater than 20.
+- Determine how many values satisfy the condition using logical operations.
+
+#### Programming Concepts
+
+- Numeric vectors and sequence generation
+- Vector length and indexing
+- Arithmetic transformations
+- Mean and median calculations
+- Logical comparisons and Boolean values
+- Conditional subsetting
+
+---
+
+### Part B: CO2 Dataset Analysis and Data Wrangling
+
+#### Objective
+
+Use R's built-in `CO2` dataset to summarize grouped observations, reorganize data, apply conditional transformations, and compare data manipulation approaches.
+
+#### Dataset: CO2 Uptake in Grass Plants
+
+**Source:** Built-in R dataset, accessible using `CO2` and documented with `?CO2`.
+
+The dataset records carbon dioxide uptake measurements for grass plants under chilled and nonchilled conditions at different ambient CO2 concentrations.
+
+| Variable | Description |
+|----------|-------------|
+| `Plant` | Identifier for each plant |
+| `Type` | Plant origin (Quebec or Mississippi) |
+| `Treatment` | Chilled or nonchilled treatment |
+| `conc` | Ambient CO2 concentration (mL/L) |
+| `uptake` | CO2 uptake rate (µmol/m²/s) |
+
+#### Tasks
+
+**1. Generate grouped summary statistics**
+
+- Group the dataset by `Plant` and `Treatment`.
+- Calculate the mean and standard deviation of CO2 uptake for each group.
+- Count the number of observations in each group.
+- Determine whether the dataset is balanced across the treatment groups.
+
+**2. Arrange and interpret the summary table**
+
+- Sort the grouped summary table from highest to lowest mean CO2 uptake.
+- Identify the plant and treatment combinations with the highest and lowest mean uptake.
+- Report the relevant values with appropriate units.
+
+**3. Reshape the dataset into long format**
+
+- Use `pivot_longer()` to combine `conc` and `uptake` into a column called `measurement`, with corresponding numeric values in a column called `values`.
+- Save the reshaped dataset as `CO2_long`.
+- Group the long-format data by `Plant`, `Treatment`, and `measurement`.
+- Calculate group means and describe what is observed about the average ambient CO2 concentration.
+
+**4. Filter observations and create a new variable**
+
+- Starting from `CO2_long`, retain only observations with the `nonchilled` treatment and the `uptake` measurement.
+- Create a new column called `values2` by multiplying `values` by 1.3.
+- Save the result as `CO2_new`.
+
+**5. Compare conditional data transformations**
+
+- Create `CO2_new2` by applying `ifelse()` within `mutate()` to multiply the nonchilled uptake measurements by 1.3 while preserving other values.
+- Compare `CO2_new` and `CO2_new2`, including their row counts.
+- Explain how the three arguments of `ifelse()` determine which value is returned for each observation.
+- Describe the difference between filtering rows before modification and conditionally modifying values while keeping all rows.
+
+#### Data Wrangling Concepts
+
+- Grouped data analysis with `group_by()` and `summarize()`
+- Descriptive statistics using `mean()`, `sd()`, and `n()`
+- Sorting observations with `arrange()` and `desc()`
+- Reshaping data using `pivot_longer()`
+- Filtering data with `filter()`
+- Creating variables with `mutate()`
+- Conditional transformations using `ifelse()`
+- Interpreting experimental plant physiology data
+
+---
+
+## 🛠️ Technical Skills Covered
+
+| Category | Skills |
+|----------|--------|
+| Programming Language | R |
+| Development Environment | RStudio / R Markdown |
+| Libraries | tidyverse, dplyr, tidyr |
+| Data Structures | Numeric and Logical Vectors, Data Frames, Tibbles |
+| Statistical Computing | Mean, Median, Standard Deviation, Counts |
+| Data Manipulation | Indexing, Grouping, Sorting, Filtering, Reshaping |
+| Conditional Logic | Logical Comparisons, `ifelse()` |
+| Biological Applications | Plant CO2 Uptake Measurements |
+
+---
+
+## 🎯 Learning Objectives
+
+By completing the assignment, the goals were to:
+
+1. Create and manipulate numeric and logical vectors in R.
+2. Apply indexing and basic descriptive statistics to selected observations.
+3. Summarize experimental measurements by relevant groups.
+4. Recognize balanced versus unbalanced group sizes.
+5. Convert data between wide and long formats.
+6. Filter and transform biological measurements using tidyverse functions.
+7. Distinguish between removing observations and conditionally modifying existing values.
+
+---
+
+## 🔬 Relevance to Bioinformatics
+
+The data wrangling techniques practiced in this assignment provide a foundation for organizing and preparing biological datasets before further analysis. Grouping, reshaping, filtering, and conditional transformations are useful when working with experimental measurements, clinical variables, and high-dimensional biological data.
+
+---
+
+## 📁 Assignment Files
+
+- **Completed assignment (PDF):** Written responses and R output.
+- **R Markdown source (`.Rmd`):** Code and documentation used to complete the assignment.
+
+The `CO2` dataset is included with R, so no separate dataset download is required.
+
+---
+
 ## 🚀 Future Development
 
 As the course progresses, this repository will be updated with additional assignments and projects involving:
@@ -312,8 +475,6 @@ As the course progresses, this repository will be updated with additional assign
 - Statistical modeling
 - Biomedical data interpretation
 - Applied biostatistics
-
-These future exercises will build upon the foundational R programming and data wrangling concepts introduced in Assignment 1.
 
 ---
 
