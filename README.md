@@ -332,5 +332,5 @@ Clinical Bioinformatics | Humber Polytechnic
 
 **Research Interests:** Bioinformatics, Computational Biology, Cancer Genomics, and Biomedical Data Analysis
 
-**October 2026**
+**Sept 2026 - May 2027**
 
