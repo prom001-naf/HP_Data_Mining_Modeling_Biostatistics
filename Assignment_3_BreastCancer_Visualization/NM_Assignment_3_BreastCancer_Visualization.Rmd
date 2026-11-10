@@ -1,0 +1,134 @@
+---
+title: "Assignment 3 - Visualization"
+author: "Nafis Mohammad"
+date: "Novemeber 2026"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+## Assignment 3 - Visualization
+
+The dataset can be accessed here: https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+%28Diagnostic%29
+
+The phenotype attributions are as follows: 
+
+1) ID number
+2) Diagnosis (M = malignant, B = benign)
+3-32)
+
+Ten real-valued features are computed for each cell nucleus:
+
+a) radius (mean of distances from center to points on the perimeter)
+b) texture (standard deviation of gray-scale values)
+c) perimeter
+d) area
+e) smoothness (local variation in radius lengths)
+f) compactness (perimeter^2 / area - 1.0)
+g) concavity (severity of concave portions of the contour)
+h) concave points (number of concave portions of the contour)
+i) symmetry
+j) fractal dimension ("coastline approximation" - 1)
+
+Here is some code to read in the dataset
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(here)
+
+bCancer <- read.csv(here("breastCancer.csv"), header = TRUE)
+
+head(bCancer)
+names(bCancer)
+class(bCancer$diagnosis)
+class(bCancer$radius_mean)
+unique(bCancer$diagnosis)
+```
+
+Hint: draw out the plot that the question is asking you for **by hand** before plotting using ggplot2. This will help you create and add to your plots.
+
+1. The aesthetic of the plot can be defined in both the main `ggplot()` function or the plot specific geometry function. What advantage does this redundancy allow for? Give an example of this use case. [0.5]
+
+> Aesthetics in `ggplot()` apply to all layers by default, while aesthetics inside a `geom_...()` apply only to that layer. For example, setting colour inside `geom_point()` colours the points without changing the boxplot layer.
+
+2. What is the difference between a bar plot and a histogram? Which is more appropriate when I am plotting the heights of all students in this course? [0.5]
+
+> A bar plot shows counts for categories, while a histogram shows the distribution of continuous numeric values in bins. Student height is continuous, so a histogram is more appropriate.
+
+3. Use the `bCancer` dataset for this entire question.
+
+a) When comparing the mean radius between diagnosis groups, what plot type would be most appropriate? Justify your response by relating back to the type of data we are portraying. Then, create the plot. Make sure to format the plot properly such as labeling the titles and axis. [1]
+
+> Diagnosis is categorical with two groups (benign and malignant), and `radius_mean` is continuous. A boxplot is appropriate because it compares the distribution of mean radius between groups.
+
+```{r q3a, message=FALSE, warning=FALSE}
+class(bCancer$diagnosis)
+class(bCancer$radius_mean)
+
+ggplot(bCancer, aes(x = diagnosis, y = radius_mean)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.1, alpha = 0.4) +
+  scale_x_discrete(name = "Diagnosis",
+                   labels = c("Benign", "Malignant")) +
+  scale_y_continuous(name = "Mean radius") +
+  ggtitle("Mean radius by diagnosis") +
+  theme_classic()
+```
+
+b) When visualizing if there is a relationship between the mean smoothness and mean compactness of the tumors, what plot type would be most appropriate? Justify your response by relating back to the type of data we are portraying. Then, create the plot. Make sure to format the plot properly such as labeling the titles and axis. [1]
+
+> Both `smoothness_mean` and `compactness_mean` are continuous numeric variables. A scatterplot is appropriate because it shows their relationship, with one point per tumour.
+
+```{r q3b, message=FALSE, warning=FALSE}
+ggplot(bCancer, aes(x = smoothness_mean, y = compactness_mean)) +
+  geom_point() +
+  scale_x_continuous(name = "Mean smoothness") +
+  scale_y_continuous(name = "Mean compactness") +
+  ggtitle("Mean smoothness vs. mean compactness") +
+  theme_classic()
+```
+
+c) Plot both the `radius_mean` and the `texture_mean` of tumours in two panels (Hint: you will need to facet), both versus diagnosis in a violin plot. Then, colour by diagnosis. Hint # 2: you will need to wrangle the data first before plotting. What is the format of the data you will need? [1.5]
+
+> Long format is needed, with a `measurement` column for the variable names and a `value` column for their values. `pivot_longer()` converts the data from wide to long format.
+
+```{r q3c, message=FALSE, warning=FALSE}
+bCancer_long <- bCancer %>%
+  pivot_longer(
+    cols = c("radius_mean", "texture_mean"),
+    names_to = "measurement",
+    values_to = "value"
+  )
+
+head(bCancer_long)
+
+ggplot(bCancer_long, aes(x = diagnosis, y = value, fill = diagnosis)) +
+  geom_violin() +
+  facet_wrap(~ measurement, scales = "free_y") +
+  scale_x_discrete(labels = c("Benign", "Malignant")) +
+  labs(title = "Mean radius and texture by diagnosis",
+       x = "Diagnosis", y = "Mean measurement value",
+       fill = "Diagnosis") +
+  theme_classic()
+```
+
+d) Finally, we want to see the spread of our data, thus we want to plot all of our data in a histogram. Plot all of the mean measurements (radius, texture, perimeter, area, smoothness, compactness, concavity, concave points, and symmetry). Plot the histograph of all of these measurements in a 9-panel figure. Colour again by diagnosis. Hint: you may need to use the `scales` argument to free the x-axis (`free_x`). [1.5]
+
+> Histograms show the distributions of these continuous measurements. Each panel needs a free x-axis because the measurements have different ranges.
+
+```{r q3d, message=FALSE, warning=FALSE}
+bCancer %>%
+  pivot_longer(
+    cols = radius_mean:symmetry_mean,
+    names_to = "measurement",
+    values_to = "value"
+  ) %>%
+  ggplot(aes(x = value, fill = diagnosis)) +
+  geom_histogram(bins = 20, alpha = 0.6, position = "identity") +
+  facet_wrap(~ measurement, scales = "free_x", ncol = 3) +
+  labs(title = "Distributions of nine mean tumour measurements",
+       x = "Mean measurement value", y = "Count",
+       fill = "Diagnosis") +
+  theme_classic()
+```
+
