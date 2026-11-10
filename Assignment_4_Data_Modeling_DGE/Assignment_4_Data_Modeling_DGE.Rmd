@@ -1,0 +1,209 @@
+---
+title: "Assignment 4 - Data Modeling & DGE"
+author: ''
+date: "November 2026"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+## Assignment 4 - Data Modeling & Differential Gene Expression
+
+The dataset can be accessed here: https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+%28Diagnostic%29
+
+The phenotype attributions are as follows:
+
+1) ID number  
+2) Diagnosis (M = malignant, B = benign)  
+3-32) Ten real-valued features are computed for each cell nucleus:
+
+a) radius (mean of distances from center to points on the perimeter)  
+b) texture (standard deviation of gray-scale values)  
+c) perimeter  
+d) area  
+e) smoothness (local variation in radius lengths)  
+f) compactness (perimeter^2 / area - 1.0)  
+g) concavity (severity of concave portions of the contour)  
+h) concave points (number of concave portions of the contour)  
+i) symmetry  
+j) fractal dimension ("coastline approximation" - 1)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+library(ggplot2)
+library(parathyroidSE)
+library(DESeq2)
+library(EnhancedVolcano)
+```
+
+## Part 1. Breast cancer data
+
+### 1. Histogram and QQ plots for `texture_mean`
+
+```{r q1-histogram}
+bCancer <- read.csv("breastCancer.csv", header = TRUE)
+
+hist(bCancer$texture_mean,
+     main = "Histogram of texture_mean",
+     xlab = "texture_mean",
+     col = "lightblue",
+     border = "white")
+```
+
+```{r q1-qq-raw}
+qqnorm(bCancer$texture_mean, main = "Normal QQ Plot of texture_mean")
+qqline(bCancer$texture_mean, col = "red")
+```
+
+**1a. Interpretation.** The histogram and QQ plot show that `texture_mean` is mildly right-skewed. In the QQ plot, points depart from the straight reference line, especially toward the upper tail, so the untransformed values are not perfectly normal.
+
+```{r q1-log-transformation}
+bCancer$texture_log <- log(bCancer$texture_mean)
+
+hist(bCancer$texture_log,
+     main = "Histogram of log(texture_mean)",
+     xlab = "log(texture_mean)",
+     col = "lightblue",
+     border = "white")
+qqnorm(bCancer$texture_log, main = "Normal QQ Plot of log(texture_mean)")
+qqline(bCancer$texture_log, col = "red")
+```
+
+**1b. Transformation choice.** I will use the log-transformed response, `log(texture_mean)`, in the linear model. Its histogram is more symmetric and its QQ plot follows the reference line more closely than the plots for the untransformed variable. This choice is based on the plots requested in Question 1.
+
+### 2. Linear model of `texture_mean` as a function of `area_mean`
+
+Because I chose the transformation in Question 1b, the model uses `log(texture_mean)` as its response.
+
+```{r q2-model}
+texture_model <- lm(log(texture_mean) ~ area_mean, data = bCancer)
+summary(texture_model)
+```
+
+**Answer.** There is a statistically significant positive association between `area_mean` and the log-transformed `texture_mean` (slope = `r round(coef(texture_model)[2], 6)`, p-value = `r format.pval(summary(texture_model)$coefficients[2, 4], digits = 3)`). Thus, larger mean cell area is associated with higher mean texture in this fitted linear model.
+
+### 3. Visualize the linear model
+
+```{r q3-model-plot}
+model_intercept <- coef(texture_model)[1]
+model_slope <- coef(texture_model)[2]
+model_title <- paste0(
+  "log(texture_mean) = ", round(model_slope, 6), " * area_mean + ",
+  round(model_intercept, 4)
+)
+
+ggplot(bCancer, aes(x = area_mean, y = texture_log)) +
+  geom_point() +
+  geom_abline(intercept = model_intercept, slope = model_slope,
+              color = "red", linewidth = 1) +
+  ggtitle(model_title) +
+  xlab("area_mean") +
+  ylab("log(texture_mean)")
+```
+
+**Answer.** The plot shows the original observations from the breast-cancer dataset with the fitted line for the model using `log(texture_mean)`.
+
+## Part 2. Parathyroid differential gene expression
+
+The following code constructs the count and sample data, fits the treatment effect while controlling for patient, and keeps the samples collected at 48 hours.
+
+```{r q4-build-object}
+data("parathyroidGenesSE")
+
+para <- assay(parathyroidGenesSE)
+sample <- colData(parathyroidGenesSE)
+colnames(para) <- colData(parathyroidGenesSE)$run
+
+para_object <- DESeqDataSetFromMatrix(
+  countData = para,
+  colData = sample,
+  design = ~ patient + treatment
+)
+
+para_object_subset <- para_object[, para_object$time == "48h"]
+```
+
+### 4. Filter low-count genes
+
+A gene is retained when it has a nonzero count in more than two sample columns. The samples themselves are unchanged by this row filter.
+
+```{r q4-filter}
+para_object_filtered <- para_object_subset[
+  rowSums(counts(para_object_subset) > 0) > 2,
+]
+dim(assay(para_object_filtered))
+```
+
+**Answer.** After filtering, the subset contains `r nrow(assay(para_object_filtered))` feature genes and `r ncol(assay(para_object_filtered))` samples.
+
+### 5. Fit the differential expression model
+
+```{r q5-deseq}
+diff_para <- DESeq(para_object_filtered)
+```
+
+**Answer.** The filtered 48-hour dataset was fitted with `DESeq()`, using the design `~ patient + treatment` so that the treatment comparison controls for patient.
+
+### 6. Differential expression for DPN
+
+The contrast below compares Control with DPN. I use an adjusted p-value cutoff of 0.05 to identify significant genes. With this contrast order, a positive log2 fold change means higher expression in Control than in DPN.
+
+```{r q6-results}
+results_DPN <- results(
+  diff_para,
+  contrast = c("treatment", "Control", "DPN"),
+  alpha = 0.05
+)
+
+results_DPN_sorted <- results_DPN[order(results_DPN$padj, na.last = NA), ]
+top5_DPN <- head(results_DPN_sorted[, c("log2FoldChange", "pvalue", "padj")], 5)
+top5_DPN
+
+up_in_control <- sum(
+  results_DPN$padj < 0.05 & results_DPN$log2FoldChange > 0,
+  na.rm = TRUE
+)
+down_in_control <- sum(
+  results_DPN$padj < 0.05 & results_DPN$log2FoldChange < 0,
+  na.rm = TRUE
+)
+up_in_DPN <- down_in_control
+down_in_DPN <- up_in_control
+```
+
+**Answer.** The five genes with the smallest non-missing adjusted p-values are shown in the table above. At the `padj < 0.05` cutoff, `r up_in_DPN` genes are up-regulated in DPN relative to Control and `r down_in_DPN` genes are down-regulated in DPN relative to Control. The contrast is Control versus DPN, so a negative log2 fold change indicates higher expression in DPN.
+
+### 7. Compare expression of the gene with the highest log fold change
+
+```{r q7-plot-counts}
+highest_logFC_row <- which.max(results_DPN$log2FoldChange)
+highest_logFC_gene <- rownames(results_DPN)[highest_logFC_row]
+highest_logFC_value <- results_DPN$log2FoldChange[highest_logFC_row]
+
+plotCounts(
+  diff_para,
+  gene = highest_logFC_gene,
+  intgroup = "treatment"
+)
+```
+
+**Answer.** The gene with the highest log2 fold change for the Control-versus-DPN contrast is `r highest_logFC_gene` (log2 fold change = `r round(highest_logFC_value, 3)`). Its normalized counts are highest in Control, while DPN and OHT counts are near the bottom of the plotted range at 48 hours; the Control values also vary across samples.
+
+### 8. Volcano plot for the DPN comparison
+
+The volcano plot uses the DPN-versus-Control results from Question 6 and a raw p-value cutoff of 0.05.
+
+```{r q8-volcano, fig.width=8, fig.height=6}
+EnhancedVolcano(
+  results_DPN,
+  lab = rownames(results_DPN),
+  x = "log2FoldChange",
+  y = "pvalue",
+  pCutoff = 0.05,
+  FCcutoff = 0,
+  xlim = c(-20, 10),
+  title = "Control versus DPN at 48 hours",
+  subtitle = "Raw p-value cutoff = 0.05"
+)
+```
+
