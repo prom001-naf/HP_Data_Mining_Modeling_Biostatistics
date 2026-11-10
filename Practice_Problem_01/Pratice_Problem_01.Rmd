@@ -1,0 +1,80 @@
+---
+title: "Practice_Problem_01"
+author: "Nafis Mohammad"
+date: "2026-10-26"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+# Load the required packages
+library(tidyverse)
+library(here)
+
+# Import the dataset
+heart <- read.csv(
+  "C:/Users/nafis/OneDrive/Documents/Data_Mining_Modeling_Biostat/Practice_Problem_01/healthcare-dataset-stroke-data.csv",
+  header = TRUE,
+  stringsAsFactors = TRUE
+)
+
+# Examine the two variables
+heart %>%
+  select(bmi, avg_glucose_level) %>%
+  head()
+```
+
+> "BMI is the independent variable because it is being used to predict average glucose level, which is the dependent variable. BMI is easier to clinically evaluate because it only requires a patient's height and weight, whereas measuring blood glucose requires a blood sample or specialized glucose-monitoring equipment."
+
+```{r}
+# Check the structure and missing values
+str(heart)
+summary(heart)
+
+# Data wrangling
+heart_clean <- heart %>%
+  select(bmi, avg_glucose_level) %>%
+  mutate(bmi = as.numeric(as.character(bmi))) %>%
+  drop_na(bmi, avg_glucose_level)
+
+# Check the cleaned dataset
+str(heart_clean)
+nrow(heart_clean)
+
+# Run a linear regression model
+glucose_model <- lm(avg_glucose_level ~ bmi, data = heart_clean)
+
+# View the results
+summary(glucose_model)
+```
+
+> "Before running the linear regression model, the BMI and average glucose level columns were selected. BMI was converted into a numeric variable, and observations containing missing values were removed, leaving 4,909 observations. A linear regression model was performed using BMI as the independent variable and average glucose level as the dependent variable. The results showed a statistically significant positive relationship between BMI and average glucose level (p < 0.05). However, the R-squared value of 0.0308 indicates that BMI explains only approximately 3.08% of the variation in average glucose levels. Therefore, although BMI is a statistically significant predictor of average glucose level, the relationship is relatively weak."
+
+```{r}
+# Calculate the slope
+slope <- sum(
+  (heart_clean$bmi - mean(heart_clean$bmi)) *
+  (heart_clean$avg_glucose_level - mean(heart_clean$avg_glucose_level))
+) / sum(
+  (heart_clean$bmi - mean(heart_clean$bmi))^2
+)
+
+# Calculate the intercept
+intercept <- mean(heart_clean$avg_glucose_level) -
+  slope * mean(heart_clean$bmi)
+
+# Create a function to predict glucose level from BMI
+predict_glucose <- function(bmi) {
+  predicted_glucose <- intercept + slope * bmi
+  return(predicted_glucose)
+}
+
+# Test the function using a BMI of 25
+predict_glucose(25)
+
+# Test the function using a BMI of 30
+predict_glucose(30)
+```
+
+> "A function called predict_glucose was created using the slope and intercept of the linear regression equation to predict average glucose level from BMI. The function estimates an average glucose level of 101.44 for a patient with a BMI of 25 and 106.40 for a patient with a BMI of 30. The positive slope indicates that predicted average glucose level increases by approximately 0.99 units for every one-unit increase in BMI. However, because the correlation is weak, BMI alone is not a strong predictor of glucose level."
