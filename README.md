@@ -465,6 +465,20 @@ The `CO2` dataset is included with R, so no separate dataset download is require
 
 ---
 
+## 🧬 Assignment 3: Data Visualization
+
+The completed R Markdown source and rendered PDF are in `Assignment_3_BreastCancer_Visualization/`. The work uses the Wisconsin breast cancer dataset to select and build visualizations for tumor features and diagnosis groups.
+
+## 📊 Assignment 4: Data Modeling and Differential Gene Expression
+
+The completed source and PDF are in `Assignment_4_Data_Modeling_DGE/`. The assignment covers breast cancer feature distributions and linear modeling, followed by filtering and differential gene expression analysis of the Parathyroid dataset, including result visualization.
+
+## 🩺 Practice Problem 01: BMI and Glucose Regression
+
+The R Markdown source and rendered PDF are in `Practice_Problem_01/`. The exercise explores BMI and glucose measurements, fits a linear regression, and uses the model to predict glucose values.
+
+---
+
 ## 🚀 Future Development
 
 As the course progresses, this repository will be updated with additional assignments and projects involving:
@@ -494,4 +508,5 @@ Clinical Bioinformatics | Humber Polytechnic
 **Research Interests:** Bioinformatics, Computational Biology, Cancer Genomics, and Biomedical Data Analysis
 
 **Sept 2026 - May 2027**
+
 
