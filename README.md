@@ -7,6 +7,20 @@ This repository documents my progression in learning R, from foundational progra
 
 As the course progresses, this repository will be updated with additional assignments and projects.
 
+## Repository organization
+
+Each assignment has a dedicated folder containing its source document, rendered submission where available, assignment guide, and required input data. The practice problem follows the same pattern.
+
+```text
+Assignment_1_Breast_Cancer_Data_Wrangling/
+Assignment_2_DataWrangling_in_R/
+Assignment_3_BreastCancer_Visualization/
+Assignment_4_Data_Modeling_DGE/
+Practice_Problem_01/
+```
+
+Use the `.Rmd` files as editable report sources. Input datasets are stored beside the work that uses them; course modules, R session state, and unrelated files are not included.
+
 ---
 
 ## 📚 Course Overview
