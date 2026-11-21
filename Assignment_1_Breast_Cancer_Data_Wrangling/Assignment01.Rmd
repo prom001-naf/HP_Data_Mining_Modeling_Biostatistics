@@ -32,7 +32,7 @@ j) fractal dimension ("coastline approximation" - 1)
 
 Here is some code to read in the dataset
 
-> bCancer <- read.csv(here("3_csv", "breastCancer.csv"), header=T)
+> bCancer <- read.csv(here("Assignment_1_Breast_Cancer_Data_Wrangling", "breastCancer.csv"), header=T)
 
 ## Questions
 
@@ -95,7 +95,7 @@ middle_mean(recent_fruits$taste)
 4. Use the Cancer data set.
 
 ```{r}
-breastCancer <- read.csv("breastCancer.csv")
+breastCancer <- read.csv(here("Assignment_1_Breast_Cancer_Data_Wrangling", "breastCancer.csv"))
 ```
 
 
