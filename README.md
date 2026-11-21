@@ -271,26 +271,6 @@ These skills provide a foundation for more advanced statistical and computationa
 
 ---
 
-## 🔬 Relevance to Bioinformatics
-
-Data wrangling and statistical computing are essential components of modern bioinformatics research.
-
-Biological datasets often contain large numbers of quantitative measurements that must be organized, filtered, and analyzed before meaningful conclusions can be drawn.
-
-The skills introduced in this assignment are relevant to:
-
-- Biomedical data preprocessing
-- Exploratory data analysis
-- Cancer genomics and diagnostic research
-- Statistical modeling
-- Machine learning classification
-- Biological feature analysis
-- Reproducible computational research
-
-Working with breast cancer diagnostic measurements provided introductory experience in handling structured biomedical data and understanding how quantitative cellular characteristics can be represented computationally.
-
-Although this assignment focuses on foundational R programming and data manipulation rather than predictive modeling, these techniques are important prerequisites for more advanced analyses.
-
 ---
 
 ## 📁 Repository Contents
@@ -435,7 +415,7 @@ The dataset records carbon dioxide uptake measurements for grass plants under ch
 
 ---
 
-## 🛠️ Technical Skills Covered
+## 🛠️ Technical Skills Developed
 
 | Category | Skills |
 |----------|--------|
@@ -450,9 +430,9 @@ The dataset records carbon dioxide uptake measurements for grass plants under ch
 
 ---
 
-## 🎯 Learning Objectives
+## 🎯 Key Learning Outcomes
 
-By completing the assignment, the goals were to:
+Through this assignment, I developed practical experience in:
 
 1. Create and manipulate numeric and logical vectors in R.
 2. Apply indexing and basic descriptive statistics to selected observations.
@@ -463,10 +443,6 @@ By completing the assignment, the goals were to:
 7. Distinguish between removing observations and conditionally modifying existing values.
 
 ---
-
-## 🔬 Relevance to Bioinformatics
-
-The data wrangling techniques practiced in this assignment provide a foundation for organizing and preparing biological datasets before further analysis. Grouping, reshaping, filtering, and conditional transformations are useful when working with experimental measurements, clinical variables, and high-dimensional biological data.
 
 ---
 
@@ -481,11 +457,368 @@ The `CO2` dataset is included with R, so no separate dataset download is require
 
 ## 🧬 Assignment 3: Data Visualization
 
-The completed R Markdown source and rendered PDF are in `Assignment_3_BreastCancer_Visualization/`. The work uses the Wisconsin breast cancer dataset to select and build visualizations for tumor features and diagnosis groups.
+### Assignment Overview
+
+This assignment applies data visualization principles to the Wisconsin Diagnostic Breast Cancer dataset. It examines how plot choice depends on variable type and uses plots to compare tumour measurements across benign and malignant diagnoses.
+
+The assignment focuses on three main areas:
+
+1. Selecting plots based on data types and analytical questions
+2. Comparing tumour measurements across diagnosis groups
+3. Reshaping data for faceted visualizations
+
+---
+
+### Part A: Plot Selection and Aesthetic Mapping
+
+#### Objective
+
+Explain how variable types and aesthetic mappings influence the choice and construction of a plot.
+
+#### Tasks
+
+1. Explain the difference between aesthetics set in `ggplot()` and aesthetics set within a geometry layer, and give an example of when layer-specific mapping is useful.
+2. Distinguish a bar plot from a histogram and select the appropriate plot for continuous measurements such as student height.
+
+#### Concepts Practiced
+
+- Global and layer-specific aesthetic mappings
+- Categorical and continuous variables
+- Choosing a visualization to match the question
+- Geoms and plot layers in `ggplot2`
+
+---
+
+### Part B: Visualizing Breast Cancer Measurements
+
+#### Objective
+
+Use the breast cancer dataset to compare distributions, examine relationships between measurements, and visualize multiple features by diagnosis.
+
+#### Dataset: Wisconsin Diagnostic Breast Cancer
+
+The dataset contains a diagnosis label and numerical measurements derived from digitized images of fine needle aspirates of breast masses. The analysis uses the diagnosis, mean radius, mean texture, mean smoothness, and mean compactness variables.
+
+| Variable | Description |
+|----------|-------------|
+| `diagnosis` | Tumour classification: benign (`B`) or malignant (`M`) |
+| `radius_mean` | Mean radius measurement of cell nuclei |
+| `texture_mean` | Mean texture measurement of cell nuclei |
+| `smoothness_mean` | Mean local variation in radius lengths |
+| `compactness_mean` | Mean compactness measurement |
+
+#### 1. Compare Mean Radius by Diagnosis
+
+Diagnosis is categorical and `radius_mean` is continuous. A boxplot compares the distributions across diagnosis groups; jittered points show individual observations.
+
+```r
+ggplot(bCancer, aes(x = diagnosis, y = radius_mean)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.1, alpha = 0.4) +
+  scale_x_discrete(name = "Diagnosis",
+                   labels = c("Benign", "Malignant")) +
+  scale_y_continuous(name = "Mean radius") +
+  ggtitle("Mean radius by diagnosis") +
+  theme_classic()
+```
+
+#### 2. Examine Smoothness and Compactness
+
+Both measurements are continuous, so a scatterplot displays their relationship with one point per observation.
+
+```r
+ggplot(bCancer, aes(x = smoothness_mean, y = compactness_mean)) +
+  geom_point() +
+  scale_x_continuous(name = "Mean smoothness") +
+  scale_y_continuous(name = "Mean compactness") +
+  ggtitle("Mean smoothness vs. mean compactness") +
+  theme_classic()
+```
+
+#### 3. Compare Radius and Texture with Violin Plots
+
+The two measurements are converted from wide to long format so they can be displayed in separate facets. The violin plots show each measurement's distribution by diagnosis.
+
+```r
+bCancer_long <- bCancer %>%
+  pivot_longer(
+    cols = c("radius_mean", "texture_mean"),
+    names_to = "measurement",
+    values_to = "value"
+  )
+
+ggplot(bCancer_long, aes(x = diagnosis, y = value, fill = diagnosis)) +
+  geom_violin() +
+  facet_wrap(~ measurement, scales = "free_y") +
+  scale_x_discrete(labels = c("Benign", "Malignant")) +
+  labs(title = "Mean radius and texture by diagnosis",
+       x = "Diagnosis", y = "Mean measurement value",
+       fill = "Diagnosis") +
+  theme_classic()
+```
+
+#### 4. Plot Nine Mean Measurements
+
+The nine specified mean measurements are reshaped into long format and plotted as histograms. Faceting with a free x-axis accommodates the different measurement ranges; colour indicates diagnosis.
+
+```r
+bCancer %>%
+  pivot_longer(
+    cols = radius_mean:symmetry_mean,
+    names_to = "measurement",
+    values_to = "value"
+  ) %>%
+  ggplot(aes(x = value, fill = diagnosis)) +
+  geom_histogram(bins = 20, alpha = 0.6, position = "identity") +
+  facet_wrap(~ measurement, scales = "free_x", ncol = 3) +
+  labs(title = "Distributions of nine mean tumour measurements",
+       x = "Mean measurement value", y = "Count",
+       fill = "Diagnosis") +
+  theme_classic()
+```
+
+#### Visualization Concepts
+
+- Boxplots and jittered observations
+- Scatterplots for two continuous variables
+- Violin plots for grouped distributions
+- Histograms for continuous-variable distributions
+- Long-format data with `pivot_longer()`
+- Faceting and free scales
+- Labels, titles, colour, and fill aesthetics
+
+---
+
+## 🛠️ Technical Skills Developed
+
+| Category | Skills |
+|----------|--------|
+| Programming Language | R |
+| Development Environment | RStudio / R Markdown |
+| Libraries | tidyverse, ggplot2, tidyr |
+| Data Visualization | Boxplots, Scatterplots, Violin Plots, Histograms |
+| Data Manipulation | Selecting and reshaping variables |
+| Plot Design | Aesthetic mapping, facets, scales, labels, themes |
+| Biomedical Data | Comparing tumour measurements by diagnosis |
+
+---
+
+## 🎯 Key Learning Outcomes
+
+Through this assignment, I developed practical experience in:
+
+1. Selecting plot types based on the variable types and question.
+2. Distinguishing categorical bar plots from continuous-data histograms.
+3. Comparing continuous measurements across diagnosis groups.
+4. Visualizing relationships between two continuous variables.
+5. Reshaping data to support multi-panel plots.
+6. Formatting plots with labels, titles, colour, and appropriate scales.
+
+---
+
+## 📁 Assignment Files
+
+- [R Markdown source](Assignment_3_BreastCancer_Visualization/NM_Assignment_3_BreastCancer_Visualization.Rmd)
+- [Rendered assignment PDF](Assignment_3_BreastCancer_Visualization/NM_Assignment_3_BreastCancer_Visualization.pdf)
+- [Breast cancer dataset](Assignment_3_BreastCancer_Visualization/breastCancer.csv)
+
+---
 
 ## 📊 Assignment 4: Data Modeling and Differential Gene Expression
 
-The completed source and PDF are in `Assignment_4_Data_Modeling_DGE/`. The assignment covers breast cancer feature distributions and linear modeling, followed by filtering and differential gene expression analysis of the Parathyroid dataset, including result visualization.
+### Assignment Overview
+
+This assignment applies exploratory distribution checks, linear modeling, and differential expression analysis to breast cancer measurements and the Parathyroid experiment dataset.
+
+The analysis is organized into two parts:
+
+1. Breast cancer feature distributions and a linear model
+2. Differential gene expression at 48 hours, controlling for patient
+
+---
+
+### Part A: Breast Cancer Data and Linear Modeling
+
+#### Objective
+
+Assess the distribution of `texture_mean`, choose a response transformation, fit a linear model using `area_mean`, and visualize the fitted relationship.
+
+#### 1. Inspect the Distribution of `texture_mean`
+
+Histograms and normal Q-Q plots are used to inspect the untransformed measurement and its log transformation. The untransformed values are mildly right-skewed; the log-transformed values appear more symmetric and closer to the Q-Q reference line.
+
+```r
+bCancer <- read.csv("breastCancer.csv", header = TRUE)
+
+hist(bCancer$texture_mean,
+     main = "Histogram of texture_mean",
+     xlab = "texture_mean",
+     col = "lightblue",
+     border = "white")
+qqnorm(bCancer$texture_mean)
+qqline(bCancer$texture_mean, col = "red")
+
+bCancer$texture_log <- log(bCancer$texture_mean)
+hist(bCancer$texture_log,
+     main = "Histogram of log(texture_mean)",
+     xlab = "log(texture_mean)",
+     col = "lightblue",
+     border = "white")
+qqnorm(bCancer$texture_log)
+qqline(bCancer$texture_log, col = "red")
+```
+
+#### 2. Fit a Linear Model
+
+The response is `log(texture_mean)` and the predictor is `area_mean`.
+
+```r
+texture_model <- lm(log(texture_mean) ~ area_mean, data = bCancer)
+summary(texture_model)
+```
+
+The fitted model shows a statistically significant positive association between `area_mean` and log-transformed `texture_mean`. This is an association in the fitted model and does not establish causation.
+
+#### 3. Visualize the Fitted Relationship
+
+```r
+model_intercept <- coef(texture_model)[1]
+model_slope <- coef(texture_model)[2]
+
+ggplot(bCancer, aes(x = area_mean, y = texture_log)) +
+  geom_point() +
+  geom_abline(intercept = model_intercept, slope = model_slope,
+              color = "red", linewidth = 1) +
+  xlab("area_mean") +
+  ylab("log(texture_mean)") +
+  theme_classic()
+```
+
+---
+
+### Part B: Parathyroid Differential Gene Expression
+
+#### Objective
+
+Prepare the Parathyroid experiment count data, filter low-count genes, fit a treatment model while controlling for patient, and summarize the Control-versus-DPN comparison at 48 hours.
+
+#### Dataset and Model
+
+The count matrix and sample metadata are provided by the `parathyroidSE` R package. The design `~ patient + treatment` accounts for patient while estimating treatment differences. The analysis restricts the samples to the 48-hour time point.
+
+```r
+data("parathyroidGenesSE")
+
+para <- assay(parathyroidGenesSE)
+sample <- colData(parathyroidGenesSE)
+colnames(para) <- colData(parathyroidGenesSE)$run
+
+para_object <- DESeqDataSetFromMatrix(
+  countData = para,
+  colData = sample,
+  design = ~ patient + treatment
+)
+
+para_object_subset <- para_object[, para_object$time == "48h"]
+```
+
+#### Analysis Tasks
+
+1. Retain genes with nonzero counts in more than two sample columns.
+2. Fit the filtered dataset using `DESeq()`.
+3. Extract the Control-versus-DPN contrast and order results by adjusted p-value.
+4. Report the five genes with the smallest non-missing adjusted p-values.
+5. Count significant genes at an adjusted p-value threshold of 0.05 and interpret the direction of the contrast.
+6. Plot normalized counts for the gene with the highest log2 fold change.
+7. Create a volcano plot using the raw p-value cutoff of 0.05.
+
+#### 1. Filter and Fit the Model
+
+```r
+para_object_filtered <- para_object_subset[
+  rowSums(counts(para_object_subset) > 0) > 2,
+]
+
+diff_para <- DESeq(para_object_filtered)
+```
+
+The filter removes genes that have nonzero counts in two or fewer samples. It does not remove sample columns.
+
+#### 2. Extract the DPN Contrast
+
+```r
+results_DPN <- results(
+  diff_para,
+  contrast = c("treatment", "Control", "DPN"),
+  alpha = 0.05
+)
+
+results_DPN_sorted <- results_DPN[
+  order(results_DPN$padj, na.last = NA),
+]
+top5_DPN <- head(
+  results_DPN_sorted[, c("log2FoldChange", "pvalue", "padj")],
+  5
+)
+```
+
+For this contrast order, a positive log2 fold change indicates higher expression in Control than DPN; a negative value indicates higher expression in DPN. The adjusted p-value threshold used to count significant genes is 0.05.
+
+#### 3. Visualize Results
+
+The analysis uses `plotCounts()` to compare normalized counts for the gene with the highest log2 fold change and `EnhancedVolcano()` to display the DPN comparison using a raw p-value cutoff of 0.05.
+
+#### Statistical and Data Analysis Concepts
+
+- Histogram and normal Q-Q plot assessment
+- Log transformation of a positive response variable
+- Linear model fitting with `lm()`
+- Model coefficients and fitted-line visualization
+- Count matrices and sample metadata
+- Low-count gene filtering
+- Differential expression with `DESeq2`
+- Treatment contrasts and log2 fold-change interpretation
+- Adjusted and raw p-value thresholds
+- Normalized count and volcano plot visualization
+
+---
+
+## 🛠️ Technical Skills Developed
+
+| Category | Skills |
+|----------|--------|
+| Programming Language | R |
+| Development Environment | RStudio / R Markdown |
+| Packages | ggplot2, parathyroidSE, DESeq2, EnhancedVolcano |
+| Distribution Assessment | Histograms, normal Q-Q plots, log transformation |
+| Statistical Modeling | Linear regression, model coefficients, treatment contrasts |
+| Gene Expression Analysis | Count filtering, DESeq2 model fitting, adjusted p-values |
+| Visualization | Fitted-line plots, normalized count plots, volcano plots |
+
+---
+
+## 🎯 Key Learning Outcomes
+
+Through this assignment, I developed practical experience in:
+
+1. Assessing measurement distributions with histograms and Q-Q plots.
+2. Applying and interpreting a log transformation.
+3. Fitting and visualizing a linear model.
+4. Preparing count data and sample metadata for differential expression analysis.
+5. Filtering low-count genes and fitting a model that controls for patient.
+6. Interpreting contrast direction, log2 fold changes, and p-value thresholds.
+7. Visualizing normalized counts and differential expression results.
+
+---
+
+## 📁 Assignment Files
+
+- [Student guide](Assignment_4_Data_Modeling_DGE/Assignment_4_Student_Guide.pdf)
+- [R Markdown source](Assignment_4_Data_Modeling_DGE/Assignment_4_Data_Modeling_DGE.Rmd)
+- [Rendered assignment PDF](Assignment_4_Data_Modeling_DGE/Assignment_4_Data_Modeling_DGE.pdf)
+- [Breast cancer dataset](Assignment_4_Data_Modeling_DGE/breastCancer.csv)
+
+---
 
 ## 🩺 Practice Problem 01: BMI and Glucose Regression
 
@@ -522,5 +855,6 @@ Clinical Bioinformatics | Humber Polytechnic
 **Research Interests:** Bioinformatics, Computational Biology, Cancer Genomics, and Biomedical Data Analysis
 
 **Sept 2026 - May 2027**
+
 
 
