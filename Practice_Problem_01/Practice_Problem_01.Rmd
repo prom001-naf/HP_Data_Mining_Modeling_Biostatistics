@@ -14,7 +14,7 @@ library(here)
 
 # Import the dataset
 heart <- read.csv(
-  "C:/Users/nafis/OneDrive/Documents/Data_Mining_Modeling_Biostat/Practice_Problem_01/healthcare-dataset-stroke-data.csv",
+  here("Practice_Problem_01", "healthcare-dataset-stroke-data.csv"),
   header = TRUE,
   stringsAsFactors = TRUE
 )
