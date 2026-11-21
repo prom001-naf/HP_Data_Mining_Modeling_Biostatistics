@@ -5,7 +5,17 @@ A collection of R programming assignments, statistical computing exercises, and 
 
 This repository documents my progression in learning R, from foundational programming and data wrangling to statistical analysis, data mining, and computational approaches used in biomedical research.
 
-## Repository organization
+## Selected coursework
+
+| Work | Methods and tools | Source and report |
+|---|---|---|
+| [Assignment 4: Modeling and differential expression](Assignment_4_Data_Modeling_DGE/) | R, linear models, DESeq2, treatment contrasts, normalized-count and volcano plots | [R Markdown](Assignment_4_Data_Modeling_DGE/Assignment_4_Data_Modeling_DGE.Rmd) · [PDF](Assignment_4_Data_Modeling_DGE/Assignment_4_Data_Modeling_DGE.pdf) |
+| [Assignment 3: Data visualization](Assignment_3_BreastCancer_Visualization/) | ggplot2, exploratory visualization, reshaping and faceting | [R Markdown](Assignment_3_BreastCancer_Visualization/NM_Assignment_3_BreastCancer_Visualization.Rmd) · [PDF](Assignment_3_BreastCancer_Visualization/NM_Assignment_3_BreastCancer_Visualization.pdf) |
+| [Practice Problem 01: BMI and glucose](Practice_Problem_01/) | R, data cleaning, linear regression, prediction and model interpretation | [R Markdown](Practice_Problem_01/Practice_Problem_01.Rmd) · [PDF](Practice_Problem_01/Practice_Problem_01.pdf) |
+
+**Reproducibility:** The R Markdown files are the editable sources. Install the packages loaded by each file, open the repository in RStudio, and knit the report from its assignment folder so data paths resolve relative to the project. The differential-expression assignment additionally uses Bioconductor packages.
+
+---
 
 ## Repository organization
 
