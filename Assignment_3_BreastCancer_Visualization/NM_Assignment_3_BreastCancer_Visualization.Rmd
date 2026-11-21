@@ -36,7 +36,7 @@ Here is some code to read in the dataset
 library(tidyverse)
 library(here)
 
-bCancer <- read.csv(here("breastCancer.csv"), header = TRUE)
+bCancer <- read.csv(here("Assignment_3_BreastCancer_Visualization", "breastCancer.csv"), header = TRUE)
 
 head(bCancer)
 names(bCancer)
