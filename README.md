@@ -5,7 +5,7 @@ A collection of R programming assignments, statistical computing exercises, and 
 
 This repository documents my progression in learning R, from foundational programming and data wrangling to statistical analysis, data mining, and computational approaches used in biomedical research.
 
-As the course progresses, this repository will be updated with additional assignments and projects.
+## Repository organization
 
 ## Repository organization
 
@@ -279,20 +279,11 @@ This repository contains completed assignments, supporting datasets, and future 
 
 ### Assignment 1: Introduction to R and Data Wrangling
 
-- `Assignment01.pdf` — Completed assignment and results
-- `Assignment01.Rmd` — R Markdown source code, if available
-- `breastCancer.csv` — Breast cancer diagnostic dataset
+- [Rendered assignment PDF](Assignment_1_Breast_Cancer_Data_Wrangling/Assignment01.pdf)
+- [R Markdown source](Assignment_1_Breast_Cancer_Data_Wrangling/Assignment01.Rmd)
+- [Breast cancer dataset](Assignment_1_Breast_Cancer_Data_Wrangling/breastCancer.csv)
 
-**Reproducibility:**
-
-The `breastCancer.csv` dataset is included in the Assignment 1 folder to allow others to reproduce the data import and filtering exercises.
-
-To reproduce the analysis:
-
-1. Download or clone this repository.
-2. Open the assignment in RStudio.
-3. Ensure the dataset is accessible from the working directory.
-4. Run the R code included in the assignment.
+The dataset is included in the assignment folder, and the source uses repository-relative paths.
 
 ---
 
@@ -448,10 +439,11 @@ Through this assignment, I developed practical experience in:
 
 ## 📁 Assignment Files
 
-- **Completed assignment (PDF):** Written responses and R output.
-- **R Markdown source (`.Rmd`):** Code and documentation used to complete the assignment.
+- [Student guide](Assignment_2_DataWrangling_in_R/Assignment_2_Guide.pdf)
+- [R Markdown source](Assignment_2_DataWrangling_in_R/Assignment_2_NM.Rmd)
+- [Rendered assignment PDF](Assignment_2_DataWrangling_in_R/Assignment_2_NM.pdf)
 
-The `CO2` dataset is included with R, so no separate dataset download is required.
+The `CO2` dataset is built into R, so no separate download is required.
 
 ---
 
@@ -621,6 +613,7 @@ Through this assignment, I developed practical experience in:
 - [R Markdown source](Assignment_3_BreastCancer_Visualization/NM_Assignment_3_BreastCancer_Visualization.Rmd)
 - [Rendered assignment PDF](Assignment_3_BreastCancer_Visualization/NM_Assignment_3_BreastCancer_Visualization.pdf)
 - [Breast cancer dataset](Assignment_3_BreastCancer_Visualization/breastCancer.csv)
+- [Course-provided prompt/template](Assignment_3_BreastCancer_Visualization/3.Rmd) — included as instructions, separate from the completed report.
 
 ---
 
@@ -822,7 +815,21 @@ Through this assignment, I developed practical experience in:
 
 ## 🩺 Practice Problem 01: BMI and Glucose Regression
 
-The R Markdown source and rendered PDF are in `Practice_Problem_01/`. The exercise explores BMI and glucose measurements, fits a linear regression, and uses the model to predict glucose values.
+### Objective
+
+Use BMI to model average glucose level in the included stroke dataset, then use the fitted line to make example predictions.
+
+### Methodology
+
+The analysis selects BMI and average glucose, converts BMI to numeric, and removes rows with missing values. It fits a linear model with average glucose as the response and BMI as the predictor, then calculates the slope and intercept for a prediction function.
+
+The cleaned analysis contains 4,909 observations. The fitted relationship is positive and statistically significant, but the model's R-squared is 0.0308, so BMI alone explains only a small share of the observed glucose variation.
+
+### Files
+
+- [R Markdown source](Practice_Problem_01/Practice_Problem_01.Rmd)
+- [Rendered report](Practice_Problem_01/Practice_Problem_01.pdf)
+- [Dataset](Practice_Problem_01/healthcare-dataset-stroke-data.csv)
 
 ---
 
